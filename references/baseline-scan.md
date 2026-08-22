@@ -8,17 +8,17 @@
 |---|---|---|---|---|
 | **第 1 层 · agent 技能层** | Claude Code 真正会加载的 skill | `~\.claude\skills\`（D 盘 junction 实体 `D:\ClaudeCode\skills\`） | `ls ~/.claude/skills/` + 每个目录的 `SKILL.md` frontmatter `name` | **已装** → 排除（资源重叠，不重复装） |
 | **第 2 层 · 生态登记层** | npx skills 登记的全局 skill | `~\.agents\skills\` + 注册表 | `powershell -Command "npx skills list -g"`（**必须 PowerShell**） | **已装/登记** → 排除（若 symlink 也已挂 agent 层则双保险确认） |
-| **第 3 层 · lark-cli 内置能力层** | 编译进 CLI 二进制的 27 个飞书能力手册 | 不存在于文件系统 | `lark-cli skills list`（可精确到 `skills read <name>` 看意图） | **能力存在** → 当「能力替代品」比较，**不算**「已安装」，结果是「不装但能力已有」
+| **第 3 层 · 办公套件内置能力层** | 内置在工作台/办公套件的能力手册 | 不存在于文件系统 | 以套件提供的 CLI 查询能力清单（可精确到查看单个能力意图） | **能力存在** → 当「能力替代品」比较，**不算**「已安装」，结果是「不装但能力已有」
 
 ## 输出格式
 
 候选 × 三层的判定矩阵：
 
 ```
-候选 skill         vs agent层        vs 生态层        vs lark-cli内置
+候选 skill         vs agent层        vs 生态层        vs 办公套件内置
 --------------     --------------    --------------    --------------
-feishu-msg-bot     ~/.claude/skills  npx list          lark-im（能力重复）
-                   （无）            （无）            → 不装，走 lark-im
+feishu-msg-bot     ~/.claude/skills  npx list          套件 im（能力重复）
+                   （无）            （无）    → 不装，走套件能力
 react-best-prac    无                无                无（无交叉但无价值）
 ```
 
