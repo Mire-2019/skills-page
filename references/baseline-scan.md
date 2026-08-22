@@ -1,0 +1,31 @@
+# 三层基线扫描（baseline-scan）
+
+判断外部 skill 与「本地已有」的关系。**必须三层都扫，缺一层会导致误判**（把能力重复当成本地已有，或反过来）。
+
+## 三层定义
+
+| 层 | 是什么 | 位置 | 怎么扫 | 对候选的意义 |
+|---|---|---|---|---|
+| **第 1 层 · agent 技能层** | Claude Code 真正会加载的 skill | `~\.claude\skills\`（D 盘 junction 实体 `D:\ClaudeCode\skills\`） | `ls ~/.claude/skills/` + 每个目录的 `SKILL.md` frontmatter `name` | **已装** → 排除（资源重叠，不重复装） |
+| **第 2 层 · 生态登记层** | npx skills 登记的全局 skill | `~\.agents\skills\` + 注册表 | `powershell -Command "npx skills list -g"`（**必须 PowerShell**） | **已装/登记** → 排除（若 symlink 也已挂 agent 层则双保险确认） |
+| **第 3 层 · lark-cli 内置能力层** | 编译进 CLI 二进制的 27 个飞书能力手册 | 不存在于文件系统 | `lark-cli skills list`（可精确到 `skills read <name>` 看意图） | **能力存在** → 当「能力替代品」比较，**不算**「已安装」，结果是「不装但能力已有」
+
+## 输出格式
+
+候选 × 三层的判定矩阵：
+
+```
+候选 skill         vs agent层        vs 生态层        vs lark-cli内置
+--------------     --------------    --------------    --------------
+feishu-msg-bot     ~/.claude/skills  npx list          lark-im（能力重复）
+                   （无）            （无）            → 不装，走 lark-im
+react-best-prac    无                无                无（无交叉但无价值）
+```
+
+## 判定规则
+
+- **同名不同源**（`~/.claude/skills/foo` 与外部 `foo` 不同仓库）→ **提示核对**，不武断当已装；先出矩阵再判定重复（Q18）。
+- **第 1+2 层命中** = 资源重叠 = 排除。
+- **第 3 层命中** = 能力重复 = 「不装但有能力替代」，**不等同**「已安装」。
+- **全部未命中** = 无交叉，再判断有无价值（进价值评分）。
+- 三层扫描结果一并进价值分析第 2 项（重复/冲突栏）。
