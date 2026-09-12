@@ -1,0 +1,20 @@
+# 测试残留 —— 绝不外传
+TEST-*.md
+TEST*.md
+
+# 本机路径/个人环境痕迹
+*.local.md
+*.private.md
+
+# 临时与备份
+*.tmp
+*.bak
+*~
+*.log
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
